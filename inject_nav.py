@@ -67,6 +67,10 @@ def main():
         for filename in filenames:
             if not filename.endswith(".html") or filename in EXCLUDE_FILES:
                 continue
+            # Archivdateien (_startseite-coaching.html, _entwurf.html) werden
+            # nicht veröffentlicht und behalten ihre historische Nav.
+            if filename.startswith("_"):
+                continue
             inject_nav_into_file(os.path.join(dirpath, filename), nav_html)
 
     print("\nFertig.")

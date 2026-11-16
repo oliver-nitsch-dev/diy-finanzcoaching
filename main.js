@@ -2,143 +2,37 @@
    DIY Finanzcoaching – main.js
    ============================================================ */
 
-// ── CAL.COM BUCHUNGS-OVERLAY ──
-// Ersetzt Calendly durch das cal.com-Inline-Widget, eingebettet in ein
-// eigenes, im Seiten-Style gehaltenes Overlay. Klick auf einen Buchungs-
-// link öffnet das Overlay über der Seite – ohne sie zu verlassen.
-// Das Widget wird erst beim ersten Öffnen geladen (lazy).
-const CAL_NAMESPACE = "coaching-uebersicht";
-const CAL_LINK      = "diy-finanzcoaching-oliver-nitsch";
-
-// cal.com Embed-Loader
-(function (C, A, L) { let p = function (a, ar) { a.q.push(ar); }; let d = C.document; C.Cal = C.Cal || function () { let cal = C.Cal; let ar = arguments; if (!cal.loaded) { cal.ns = {}; cal.q = cal.q || []; d.head.appendChild(d.createElement("script")).src = A; cal.loaded = true; } if (ar[0] === L) { const api = function () { p(api, arguments); }; const namespace = ar[1]; api.q = api.q || []; if (typeof namespace === "string") { cal.ns[namespace] = cal.ns[namespace] || api; p(cal.ns[namespace], ar); p(cal, ["initNamespace", namespace]); } else p(cal, ar); return; } p(cal, ar); }; })(window, "https://app.cal.com/embed/embed.js", "init");
-
-Cal("init", CAL_NAMESPACE, { origin: "https://app.cal.com" });
-Cal.config = Cal.config || {};
-Cal.config.forwardQueryParams = true;
-
-Cal.ns[CAL_NAMESPACE]("ui", {
-  theme: "light",
-  cssVarsPerTheme: {
-    light: {
-      "cal-brand": "#2d5a3d",
-      "cal-text": "#1a1a18",
-      "cal-text-emphasis": "#1a1a18",
-      "cal-text-muted": "#7a7668",
-      "cal-text-error": "#a33030",
-      "cal-border": "#d4cfc3",
-      "cal-border-default": "#d4cfc3",
-      "cal-border-subtle": "#d4cfc3",
-      "cal-border-booker": "#d4cfc3",
-      "cal-bg-emphasis": "#ede9df"
-    },
-    dark: { "cal-brand": "#fafafa" }
-  },
-  hideEventTypeDetails: false,
-  layout: "month_view"
-});
-
-// Overlay-Markup einmalig ins DOM einfügen
-const calOverlay = document.createElement('div');
-calOverlay.className = 'cal-overlay';
-calOverlay.setAttribute('aria-hidden', 'true');
-calOverlay.innerHTML = `
-  <div class="cal-overlay__backdrop" data-cal-close></div>
-  <div class="cal-overlay__dialog" role="dialog" aria-modal="true" aria-label="Termin buchen">
-    <button class="cal-overlay__close" type="button" aria-label="Schließen" data-cal-close>&times;</button>
-    <div class="cal-overlay__body">
-      <div id="cal-modal-inline" class="cal-overlay__embed"></div>
-    </div>
-  </div>
-`;
-document.body.appendChild(calOverlay);
-
-let calEmbedLoaded = false;
-
-function openCalOverlay() {
-  if (!calEmbedLoaded) {
-    Cal.ns[CAL_NAMESPACE]("inline", {
-      elementOrSelector: "#cal-modal-inline",
-      config: { layout: "month_view", useSlotsViewOnSmallScreen: "true" },
-      calLink: CAL_LINK,
-    });
-    calEmbedLoaded = true;
-  }
-  calOverlay.classList.add('cal-overlay--open');
-  calOverlay.setAttribute('aria-hidden', 'false');
-  document.body.style.overflow = 'hidden';
-}
-
-function closeCalOverlay() {
-  calOverlay.classList.remove('cal-overlay--open');
-  calOverlay.setAttribute('aria-hidden', 'true');
-  document.body.style.overflow = '';
-}
-
-// Klick-Delegation: alle Buchungslinks (data-cal-book) öffnen das Overlay.
-// Bewusst KEIN data-cal-link, damit cal.com kein eigenes Popup dazu bindet.
-document.addEventListener('click', (e) => {
-  const trigger = e.target.closest('[data-cal-book]');
-  if (trigger) {
-    e.preventDefault();
-    openCalOverlay();
-    return;
-  }
-  if (e.target.closest('[data-cal-close]')) {
-    closeCalOverlay();
-  }
-});
-
-document.addEventListener('keydown', (e) => {
-  if (e.key === 'Escape' && calOverlay.classList.contains('cal-overlay--open')) {
-    closeCalOverlay();
-  }
-});
-
 // ── ROOT PATH DETECTION ──
 // Erkennt den Pfad zum Site-Root anhand des style.css-Links.
 // Root-Seiten laden "style.css", Blog-Seiten "../style.css".
 const _cssHref = document.querySelector('link[href$="style.css"]')?.getAttribute('href') ?? 'style.css';
 const ROOT = _cssHref.replace('style.css', '') || './';
 
-// ── DYNAMIC NAV DRAWER ──
-// Drawer wird nach dem <nav> ins DOM eingefügt
-const drawerHTML = `
-<div class="nav-drawer" id="nav-drawer">
-  <a class="nav-drawer-link" href="${ROOT}">Start</a>
-  <a class="nav-drawer-link" href="${ROOT}#pricing">Preise</a>
-  <a class="nav-drawer-link" href="${ROOT}#contact">Kontakt</a>
-  <a class="nav-drawer-link" href="https://app.diy-finanzcoaching.de/dashboard" rel="noopener noreferrer">Login →</a>
-  <a class="nav-drawer-link" href="https://app.cal.com/diy-finanzcoaching-oliver-nitsch" data-cal-book rel="noopener noreferrer">Termin buchen</a>
-  <div class="nav-drawer-meta">
-    <a href="${ROOT}impressum.html">Impressum</a>
-    <a href="${ROOT}datenschutz.html">Datenschutz</a>
-  </div>
-</div>
-`;
-document.querySelector('nav').insertAdjacentHTML('afterend', drawerHTML);
+// ── NAV ──
+// Seit der Einstellung des Angebots besteht die Nav nur noch aus dem Logo
+// (kein Burger/Drawer mehr). Die Hide-on-Scroll-Logik unten nutzt navEl.
+const navEl = document.querySelector('nav');
 
-// ── BURGER TOGGLE ──
-const navEl     = document.querySelector('nav');
-const drawer    = document.getElementById('nav-drawer');
-const burger    = document.querySelector('.nav-burger');
-
-if (burger) {
-  burger.addEventListener('click', () => {
-    const isOpen = drawer.classList.toggle('nav-drawer--open');
-    navEl.classList.toggle('nav--open', isOpen);
-    document.body.style.overflow = isOpen ? 'hidden' : '';
-  });
+// ── HINWEIS: ANGEBOT EINGESTELLT ──
+// Auf allen Seiten außer der Startseite (Abschiedsseite) erscheint unter
+// dem Logo ein schmaler Balken mit Link zur Startseite. Er sitzt IN der
+// fixierten Nav, damit er mit ihr ein- und ausblendet. Weil die Seiten
+// ihren oberen Abstand auf die Nav-Höhe ohne Balken auslegen, bekommt der
+// body zusätzlich die Balkenhöhe als padding-top.
+if (navEl && !document.body.classList.contains('page-farewell')) {
+  navEl.insertAdjacentHTML('beforeend', `
+    <div class="offer-ended-bar">
+      Das Angebot DIY Finanzcoaching wurde eingestellt.
+      <a href="${ROOT}">Mehr erfahren →</a>
+    </div>
+  `);
+  const offerBar = navEl.querySelector('.offer-ended-bar');
+  const syncOfferBarOffset = () => {
+    document.body.style.paddingTop = offerBar.offsetHeight + 'px';
+  };
+  syncOfferBarOffset();
+  window.addEventListener('resize', syncOfferBarOffset);
 }
-
-// Close drawer when a link inside is clicked
-drawer.querySelectorAll('a').forEach(link => {
-  link.addEventListener('click', () => {
-    drawer.classList.remove('nav-drawer--open');
-    navEl.classList.remove('nav--open');
-    document.body.style.overflow = '';
-  });
-});
 
 // ── DYNAMIC FOOTER ──
 const footerHTML = `
@@ -166,10 +60,6 @@ window.addEventListener('scroll', () => {
       } else if (currentY > lastScrollY) {
         // Runterscrollen → verstecken
         navEl.classList.add('nav--hidden');
-        // Drawer schließen falls offen
-        drawer.classList.remove('nav-drawer--open');
-        navEl.classList.remove('nav--open');
-        document.body.style.overflow = '';
       } else {
         // Hochscrollen → zeigen
         navEl.classList.remove('nav--hidden');
@@ -286,8 +176,6 @@ function initCookieBanner() {
       Dabei werden Daten (u.&nbsp;a. deine IP-Adresse) an Google übertragen.
       Mit „Akzeptieren" stimmst du dem zu – bei „Ablehnen" werden keine
       Tracking-Daten erhoben und Schriften lokal ersetzt.
-      Für die Terminbuchung wird beim Öffnen des Buchungsfensters cal.com
-      geladen; dabei werden Daten an cal.com übertragen.
       <a href="${ROOT}datenschutz.html">Datenschutzerklärung</a>
     </p>
     <div class="cookie-banner-actions">
