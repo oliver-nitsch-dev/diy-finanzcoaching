@@ -45,6 +45,7 @@ nav {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  flex-wrap: wrap;
   padding: 1.25rem 5vw;
   background: rgba(245, 242, 235, 0.92);
   backdrop-filter: blur(12px);
@@ -228,6 +229,73 @@ nav.nav--open .nav-burger span:nth-child(3) { width: 100%; transform: translateY
 .nav-drawer-cta {
   margin-top: 2.5rem;
   width: 100%;
+}
+
+/* ── HINWEIS: ANGEBOT EINGESTELLT ──
+   Wird per main.js in die fixierte Nav eingefügt (alle Seiten außer der
+   Startseite). Negative Ränder heben das Nav-Padding auf, damit der Balken
+   bündig über die volle Breite am unteren Nav-Rand sitzt. */
+.offer-ended-bar {
+  flex: 0 0 calc(100% + 10vw); /* Inhaltsbreite + beide Nav-Paddings */
+  order: 10;
+  margin: 1.25rem -5vw -1.25rem;
+  padding: 0.5rem 5vw;
+  background: var(--accent);
+  color: var(--paper);
+  font-size: 0.85rem;
+  line-height: 1.5;
+  text-align: center;
+}
+.offer-ended-bar a {
+  color: var(--paper);
+  font-weight: 500;
+  margin-left: 0.4rem;
+  white-space: nowrap;
+}
+.offer-ended-bar a:hover { color: var(--gold); }
+
+/* ── ABSCHIEDSSEITE (Startseite seit Einstellung des Angebots) ── */
+.hero.farewell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+/* Gleichmäßig abdunkeln statt des Verlaufs der alten Startseite (rechts hell),
+   weil der Text hier zentriert über die volle Breite läuft. */
+.hero.farewell::after { background: rgba(20, 18, 14, 0.78); }
+.farewell-inner {
+  position: relative;
+  z-index: 1;
+  max-width: 46rem;
+  padding: 4rem 1.5rem;
+}
+.farewell .hero-eyebrow { justify-content: center; }
+.farewell-lead {
+  color: rgba(245, 242, 235, 0.9);
+  font-size: 1.15rem;
+  line-height: 1.7;
+  margin: 0 auto 1.5rem;
+  max-width: 40ch;
+}
+.farewell-text {
+  color: rgba(245, 242, 235, 0.75);
+  font-size: 1rem;
+  margin: 0 auto 1rem;
+  max-width: 46ch;
+}
+.farewell-text a {
+  color: var(--paper);
+  text-decoration-color: var(--gold);
+  text-underline-offset: 3px;
+}
+.farewell-text a:hover { color: var(--gold); }
+.farewell-signature {
+  font-family: 'Playfair Display', serif;
+  font-style: italic;
+  color: var(--gold);
+  font-size: 1.1rem;
+  margin-top: 2rem;
 }
 
 /* ── HERO ── */

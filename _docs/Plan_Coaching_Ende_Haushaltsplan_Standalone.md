@@ -8,7 +8,13 @@ Das Coaching-Angebot (Mitgliedschaft 135 €/Jahr, Kennenlerngespräch via cal.c
 
 Betroffene Repos: `oliver-nitsch-dev/membership` (App) und `oliver-nitsch-dev/diy-finanzcoaching` (Website). Dieses Dokument liegt identisch in beiden Repos (`membership/docs/`, `diy-finanzcoaching/_docs/` – Unterstrich, damit GitHub Pages es nicht veröffentlicht).
 
-Status: **Plan, noch nicht umgesetzt** (Stand 2026-11-06, Analyse auf `membership@f09d947` / `diy-finanzcoaching@b7f55dc`).
+Status: **Teil B (Website) umgesetzt am 2026-11-16**, Teil A (App) noch offen. Analyse auf `membership@f09d947` / `diy-finanzcoaching@b7f55dc`.
+
+**Abweichungen bei der Umsetzung von Teil B (2026-11-16):**
+- **Kein Login-Hinweis auf der Website.** Weder die Box „Du bist bereits Mitglied?“ auf der Abschiedsseite noch der „Login →“-Link in der Nav. Die wenigen Betroffenen bekommen den neuen Link direkt, sobald die App umgezogen ist. Die Nav besteht damit nur noch aus dem Logo (kein Burger/Drawer mehr).
+- **cal.com-Code aus `main.js` entfernt** statt stehen gelassen: Der Embed-Loader lud `embed.js` von cal.com bei jedem Seitenaufruf, auch ohne Buchungslink. Ohne Buchung auf der Website gibt es dafür keinen Grund mehr. Die `.cal-overlay`-Styles in `style.css` sind noch da (harmlos), der Code liegt in der Git-Historie.
+- **`inject_nav.py` überspringt `_`-Dateien**, damit die Archivseiten ihre historische Nav behalten.
+- `sitemap.xml` hatte kein `lastmod`, es wurde für `/` ergänzt.
 
 Wichtige Erkenntnisse aus der Analyse:
 - Zugang zur App hängt heute nur an einer Supabase-Session (`ProtectedRoute`). Mitgliedschaften gaten nichts, daher ist für Bestandsnutzer nichts zu migrieren.
@@ -112,7 +118,7 @@ Gleicher `<head>`-Aufbau (Fonts, `style.css`, Favicons, GA-Consent über `main.j
 - **Text:**
   - „Ich habe mich entschieden, mein Angebot DIY Finanzcoaching einzustellen. Neue Mitgliedschaften und Kennenlerngespräche sind nicht mehr möglich.“
   - Dank an alle Mitglieder und Interessierten.
-- **Box** (`.legal-highlight`): „Du bist bereits Mitglied? Dein Login zum Haushaltsplan bleibt bestehen.“ mit dem Button „Zum Login →“ (`app.diy-finanzcoaching.de`).
+- ~~**Box** (`.legal-highlight`): „Du bist bereits Mitglied? Dein Login zum Haushaltsplan bleibt bestehen.“ mit dem Button „Zum Login →“~~ – entfällt (siehe Abweichungen oben).
 - **Kontakt:** „Fragen? Schreib mir an hallo@diy-finanzcoaching.de“
 
 Dazu `<meta name="description">` anpassen. Den finalen Text kannst du nach dem Commit noch anpassen. Ein konkretes Enddatum nenne ich nicht.
