@@ -5,7 +5,8 @@ Ersetzt den <nav>...</nav>-Block in allen HTML-Dateien automatisch.
 Nav-Inhalt wird zentral in _nav.html gepflegt.
 
 Der Platzhalter {ROOT} wird je nach Verzeichnistiefe relativ zum
-Repo-Root ersetzt: Root-Seiten → ./, blog/ → ../, blog/post/ → ../../
+Repo-Root ersetzt: Root-Seiten → ./, Unterordner → ../ usw.;
+404.html bekommt immer den absoluten Pfad /.
 """
 
 import os
@@ -71,7 +72,10 @@ def main():
             # nicht veröffentlicht und behalten ihre historische Nav.
             if filename.startswith("_"):
                 continue
-            inject_nav_into_file(os.path.join(dirpath, filename), nav_html)
+            # 404.html wird von GitHub Pages unter beliebigen (auch tiefen)
+            # URLs ausgeliefert – daher absoluter Pfad statt relativem.
+            html = nav_template.replace("{ROOT}", "/") if filename == "404.html" else nav_html
+            inject_nav_into_file(os.path.join(dirpath, filename), html)
 
     print("\nFertig.")
 
